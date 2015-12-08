@@ -10,9 +10,9 @@ class StepMoter:
     Clockwise, InterClockwise = range(2)
     Fast, Normal, Slow = (0.002, 0.005, 0.01)
 
-    def __init__(self, unit_amount=130):
+    def __init__(self, step_pins=(17, 18, 27, 22), unit_amount=130):
         GPIO.setmode(GPIO.BCM)
-        self.__step_pins = [17,18,27,22]
+        self.__step_pins = step_pins
         # Set all pins as output
         for pin in self.__step_pins:
             #print "Setup pins"
