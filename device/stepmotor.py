@@ -6,12 +6,12 @@ import time
 import RPi.GPIO as GPIO
 import sys
 
-class StepMoter:
+class StepMotor:
     Clockwise, InterClockwise = range(2)
     Fast, Normal, Slow = (0.002, 0.005, 0.01)
 
     def __init__(self, step_pins=(17, 18, 27, 22), unit_amount=130):
-        GPIO.setmode(GPIO.BCM)
+        # GPIO.setmode(GPIO.BCM)
         self.__step_pins = step_pins
         # Set all pins as output
         for pin in self.__step_pins:
@@ -37,7 +37,7 @@ class StepMoter:
 
     def run(self, quantity, direction=Clockwise, speed=Normal):
         # Define some settings
-        if direction == StepMoter.Clockwise:
+        if direction == StepMotor.Clockwise:
             seq = self.__cw_seq
         else:
             seq = self.__icw_seq
@@ -59,9 +59,9 @@ class StepMoter:
                 break
 
 if __name__ == '__main__':
-    s = StepMoter()
+    s = StepMotor()
     s.run( 
         quantity = 6, 
-        direction = StepMoter.InterClockwise,
-        speed = StepMoter.Slow
+        direction = StepMotor.InterClockwise,
+        speed = StepMotor.Slow
         )
