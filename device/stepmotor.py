@@ -3,15 +3,21 @@
 # 
 
 import time
-import RPi.GPIO as GPIO
 import sys
+
+try:
+    import RPi.GPIO as GPIO
+except:
+    print >> sys.stderr, 'This machine do not support GPIO. Switch to simulator mode.'
+    import simulator_gpio as GPIO
+
 
 class StepMotor:
     Clockwise, InterClockwise = range(2)
     Fast, Normal, Slow = (0.002, 0.005, 0.01)
 
     def __init__(self, step_pins=(17, 18, 27, 22), unit_amount=130):
-        # GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BCM)
         self.__step_pins = step_pins
         # Set all pins as output
         for pin in self.__step_pins:

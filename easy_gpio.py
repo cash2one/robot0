@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # gusimiu@baidu.com
 # 
+#   All device will ignore RPi.GPIO
+#   use this package as a wrapper.
+#
 
 import sys
 import json
@@ -14,7 +17,7 @@ except:
 import pydev
 
 class SimpleGPIO:
-    def __init__(self, out_pins, mode=GPIO.BCM):
+    def __init__(self, out_pins):
         GPIO.setmode(mode)
         self.__pins = []
         for pin in out_pins:

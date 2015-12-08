@@ -40,7 +40,8 @@ output:
 	mkdir output
 
 clean:
-	rm -rf $(OBJECTS) $(TARGETS) *~ .*.swp *.pyc 
+	find . -name '*~' -o -name '.*.swp' -o -name '*.pyc' | xargs rm -rf
+	#rm -rf $(OBJECTS) $(TARGETS)
 
 # common object.
 $(OBJECTS): %.o:%.cc
