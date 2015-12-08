@@ -16,9 +16,9 @@ class SingleMotor:
 
     def __init__(self, enb, out, enable_value=True):
         if len(enb) != 2:
-            print >> sys.stderr, 'ENB_PIN is not two output(s).'
+            raise 'ENB_PIN is not two output(s).'
         if len(out) != 2:
-            print >> sys.stderr, 'OUT_PIN is not two output(s).'
+            raise 'OUT_PIN is not two output(s).'
 
         GPIO.setmode(GPIO.BCM)
         self.__enb = enb

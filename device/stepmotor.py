@@ -16,7 +16,10 @@ class StepMotor:
     Clockwise, InterClockwise = range(2)
     Fast, Normal, Slow = (0.002, 0.005, 0.01)
 
-    def __init__(self, step_pins=(17, 18, 27, 22), unit_amount=130):
+    def __init__(self, step_pins, unit_amount=130):
+        if len(step_pins)!=4:
+            raise 'StepMotors need 4 pins to init.'
+
         GPIO.setmode(GPIO.BCM)
         self.__step_pins = step_pins
         # Set all pins as output
