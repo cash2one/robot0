@@ -9,16 +9,20 @@ try:
     import RPi.GPIO as GPIO
 except:
     print >> sys.stderr, 'This machine do not support GPIO. Switch to simulator mode.'
-    import simulator_gpio as GPIO
-
+    import device.simulator_gpio as GPIO
 
 class SingleMotor:
     Clockwise, InterClockwise = range(2)
 
-    def __init__(self, ENB=(5, 6), OUT=(17, 18), enable_value=True):
+    def __init__(self, enb, out, enable_value=True):
+        if len(enb) != 2:
+            print >> sys.stderr, 'ENB_PIN is not two output(s).'
+        if len(out) != 2:
+            print >> sys.stderr, 'OUT_PIN is not two output(s).'
+
         GPIO.setmode(GPIO.BCM)
-        self.__enb = ENB
-        self.__out = OUT
+        self.__enb = enb
+        self.__out = out
 
         # Set all pins as output
         for pin in self.__enb:
@@ -50,6 +54,7 @@ class SingleMotor:
 if __name__ == '__main__':
     s = SingleMotor()
     s.run( 
+        second = 10,
         direction = SingleMotor.Clockwise
         )
 

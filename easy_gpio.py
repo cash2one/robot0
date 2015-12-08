@@ -12,7 +12,7 @@ try:
     import RPi.GPIO as GPIO
 except:
     print >> sys.stderr, 'This machine do not support GPIO. Switch to simulator mode.'
-    import simulator_gpio as GPIO
+    import device.simulator_gpio as GPIO
 
 import pydev
 

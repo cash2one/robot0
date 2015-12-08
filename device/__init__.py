@@ -6,3 +6,4 @@
 
 import motor
 import stepmotor
+import simulator_gpio
