@@ -2,10 +2,16 @@
 # gusimiu@baidu.com
 # 
 
-import RPi.GPIO as GPIO
 import sys
-import pydev
 import json
+
+try:
+    import RPi.GPIO as GPIO
+except:
+    print >> sys.stderr, 'This machine do not support GPIO. Switch to simulator mode.'
+    import simulator_gpio as GPIO
+
+import pydev
 
 class SimpleGPIO:
     def __init__(self, out_pins, mode=GPIO.BCM):
@@ -52,7 +58,7 @@ class GPIORemoteServer:
             cmd = dat['cmd']
 
             if cmd == 'init':
-                print >> sys.stderr, 'Init: [%s]' % dat['pins']
+                print >> sys.stderr, 'Init: %s' % dat['pins']
                 self.__gpio = SimpleGPIO(dat['pins'])
 
             elif cmd == 'set':
@@ -71,22 +77,64 @@ class GPIORemoteServer:
         except Exception, ex:
             return '-1,%s' % (str(ex))
 
-class GPIORemoveClient:
+class GPIORemoteClient:
     def __init__(self, server_ip, server_port):
-        pass
+        self.__ip = server_ip
+        self.__port = server_port
+
+    def init(self, out_pins):
+        d = {'cmd':'init', 'pins':out_pins}
+        ret = pydev.simple_query(query=json.dumps(d), ip=self.__ip, port=self.__port)
+        print >> sys.stderr, 'Return = %s' % ret
+        return ret
+
+    def set(self, pins, value=True):
+        d = {'cmd':'set', 'pins':pins, 'value':value}
+        ret = pydev.simple_query(query=json.dumps(d), ip=self.__ip, port=self.__port)
+        print >> sys.stderr, 'Return = %s' % ret
+        return ret
+
+    def batch(self, pin_values):
+        d = {'cmd':'batch', 'kv':pin_values}
+        ret = pydev.simple_query(query=json.dumps(d), ip=self.__ip, port=self.__port)
+        print >> sys.stderr, 'Return = %s' % ret
+        return ret
+
+    def execute(self, query):
+        cmd = query.split(' ')
+        if cmd[0] == 'init':
+            self.init(map(lambda x:int(x), cmd[1].split(',')))
+        elif cmd[0] == 'set':
+            if len(cmd) == 3:
+                self.set( map(lambda x:int(x), cmd[1].split(',')), int(cmd[2]) )
+            else:
+                self.set( map(lambda x:int(x), cmd[1].split(',')) )
+        elif cmd[0] == 'batch':
+            d = dict(map(lambda x:map(lambda x:int(x), x.split(':')), cmd[1:]))
+            self.batch(d)
+        else:
+            print >> sys.stderr, 'Cannot recognize query=[%s]' % query
 
 if __name__ == '__main__':
-    if len(sys.argv)!=3:
-        print >> sys.stderr, 'Usage : easy_gpio.py <ip> <port>'
+    if len(sys.argv)!=4:
+        print >> sys.stderr, 'Usage : easy_gpio.py [server|client] <ip> <port>'
         sys.exit(-1)
 
-    ip, port = sys.argv[1], int(sys.argv[2])
-    print >> sys.stderr, 'GPIORemoteServer at %s:%d' % (ip, port)
+    mode, ip, port = sys.argv[1], sys.argv[2], int(sys.argv[3])
+    if mode == 'server':
+        print >> sys.stderr, 'GPIORemoteServer at %s:%d' % (ip, port)
 
-    gpio_server = GPIORemoteServer()
-    s = pydev.BasicService()
-    s.set_process(gpio_server.process)
-    s.run(ip, port)
+        gpio_server = GPIORemoteServer()
+        s = pydev.BasicService()
+        s.set_process(gpio_server.process)
+        s.run(ip, port)
 
+    elif mode == 'client':
+        gpio_client = GPIORemoteClient(ip, port)
+        while 1:
+            cmd = sys.stdin.readline()
+            if cmd == '':
+                break
+            gpio_client.execute(cmd)
 
 
