@@ -1,1 +1,0 @@
-../pydev/pydev.py
